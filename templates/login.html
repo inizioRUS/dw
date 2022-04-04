@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8">
+    <title>Вход - CardLearn</title>
+    <link rel="stylesheet" href="static\css\styles.css">
+</head>
+<body>
+<div class="container">
+    <div class="log-block">
+        <div class="login glass">
+            <div class="logo">
+                <h1><span>Card</span>Learn</h1>
+            </div>
+            <h2>Вход</h2>
+            <form action="" method="post">
+                {{ form.hidden_tag() }}
+                <div class="form-input">
+                    <label for="login">EMail/Nickname</label>
+                    {{ form.email(class="input-field", placeholder="Логин") }}
+                    {% for error in form.email.errors %}
+                    <p class="alert alert-danger" role="alert">
+                        {{ error }}
+                    </p>
+                    {% endfor %}
+                </div>
+                <div class="form-input">
+                    <label for="password">Password</label>
+                    {{ form.password(class="input-field", placeholder="Пароль") }}
+                    {% for error in form.password.errors %}
+                    <p class="alert alert-danger" role="alert">
+                        {{ error }}
+                    </p>
+                    {% endfor %}
+                </div>
+                <p>{{ form.remember_me() }} {{ form.remember_me.label(style="border-radius: 20px;") }}</p>
+                {{ form.submit(type="submit", class="button", value="Войт") }}
+                <div id="line"></div>
+                {{ message }}
+                <a href="/register" class="button">Регистрация</a>
+            </form>
+        </div>
+        <div class="bottom-links glass">
+            <a href=""><img class="social" src="static/images/vk.png"></a>
+            <a href=""><img class="social" src="static/images/youtube.png"></a>
+            <a href=""><img class="social" src="static/images/instagram.png"></a>
+        </div>
+    </div>
+    <footer>© 2022, CardLearn Team. Все права защищены.</footer>
+</div>
+</body>
+</html>

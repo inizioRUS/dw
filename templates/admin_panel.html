@@ -1,0 +1,45 @@
+{% extends "wrapper.html" %}
+{% block content %}
+<div>
+    <table>
+        <tr>
+            <th>Логин</th>
+            <th>Эмайл</th>
+            <th>Тип юзера</th>
+            <th>Сменить на basic</th>
+            <th>Сменить на creative</th>
+            <th>Сменить на admin</th>
+        </tr>
+        {% for i in range(data |length) %}
+        {% if current_user.id != data[i].id %}
+        <tr>
+            <td>{{data[i].login}}</td>
+            <td>{{data[i].email}}</td>
+            <td>{{data[i].type_of_user}}</td>
+            <td style="padding: 30px"><a href="/newtype?user_id={{data[i].id}}&type=basic" class="button">Click Here</a>
+            </td>
+            <td style="padding: 30px"><a href="/newtype?user_id={{data[i].id}}&type=creative" class="button">Click
+                Here</a></td>
+            {% if current_user.type_of_user == 'SAdmin' %}
+            <td style="padding: 30px"><a href="/newtype?user_id={{data[i].id}}&type=admin" class="button">Click Here</a>
+            </td>
+            {% endif %}
+        </tr>
+        {% endif %}
+        {% endfor %}
+    </table>
+    {% for i in comments %}
+    <a href="/view_of_studies/{{i.studie_id}}#{{i.id}}">
+        <div style="background: white">
+            <div class="">
+                {{i.user.login}}
+            </div>
+            <div style="padding-top: 50px">
+                {{i.text}}
+                <img src="/static/img/tmp/{{ i.user.id_foto}}.jpg" width="50px" , height="50px">
+            </div>
+        </div>
+    </a>
+    {% endfor %}
+</div>
+{% endblock %}

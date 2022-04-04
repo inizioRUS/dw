@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8">
+    <title>Вход - CardLearn</title>
+    <link rel="stylesheet" href="static\css\styles.css">
+
+</head>
+<body>
+<div class="container">
+    <div class="log-block">
+        <div class="login glass">
+            <div class="logo">
+                <h1><span>Card</span>Learn</h1>
+            </div>
+            <h2>Регистрация</h2>
+            <form action="" method="post"
+                  enctype="multipart/form-data">
+                {{ form.hidden_tag() }}
+                {{ form.csrf_token }}
+                <div class="form-input">
+                    <label for="login">EMail Address</label>
+                    {{ form.Email(class="input-field", type="email", placeholder="Почтовый ящик") }}
+                    {% for error in form.Email.errors %}
+                    <p class="alert alert-danger" role="alert">
+                        {{ error }}
+                    </p>
+                    {% endfor %}
+                </div>
+
+                <div class="form-input">
+                    <label for="login">Nickname</label>
+                    {{ form.Login(class="input-field" , type="text", placeholder="Никнейм") }}
+                    {% for error in form.Login.errors %}
+                    <p class="alert alert-danger" role="alert">
+                        {{ error }}
+                    </p>
+                    {% endfor %}
+                </div>
+
+                <div class="form-input">
+                    <label for="password">Password</label>
+                    {{ form.Password(id="pswrd", class="input-field" , type="password", placeholder="Пароль") }}
+                    <a class="password-control" onclick="return show_hide_password(this);"></a>
+                    <script>
+                      function show_hide_password(target){
+                      var input = document.getElementById('pswrd');
+                      if (input.getAttribute('type') == 'password') {
+                      target.classList.add('view');
+                      input.setAttribute('type', 'text');
+                      } else {
+                      target.classList.remove('view');
+                      input.setAttribute('type', 'password');
+                      }
+                      return false;
+                      }
+                    </script>
+
+                    {% for error in form.Password.errors %}
+                    <p class="alert alert-danger" role="alert">
+                        {{ error }}
+                    </p>
+                    {% endfor %}
+                </div>
+
+                <div class="form-input">
+                    <label for="password">Password verification</label>
+                    {{ form.Password_again(class="input-field" , type="password", placeholder="Повтор пароля")
+                    }}
+                    {% for error in form.Password_again.errors %}
+                    <p class="alert alert-danger" role="alert">
+                        {{ error }}
+                    </p>
+                    {% endfor %}
+                </div>
+                <div class="form-input">
+                    {{ form.Surname.label }}
+                    {{ form.Surname(class="input-field", placeholder="Фамилия") }}
+                    {% for error in form.Surname.errors %}
+                    <p class="alert alert-danger" role="alert">
+                        {{ error }}
+                    </p>
+                    {% endfor %}
+                </div>
+                <div class="form-input">
+                    {{ form.Name.label }}
+                    {{ form.Name(class="input-field", placeholder="Имя") }}
+                    {% for error in form.Name.errors %}
+                    <p class="alert alert-danger" role="alert">
+                        {{ error }}
+                    </p>
+                    {% endfor %}
+                </div>
+                <div class="image-upload">
+                  <img id="blah" src="#" alt="Ваше изображение">
+                  <p> {{form.photo(id="imgInp")}}
+                      {% for error in form.photo.errors %}
+                  <p class="alert alert-danger" role="alert">
+                      {{ error }}
+                  </p>
+                  </p>
+                  {% endfor %}
+                </div>
+              <div style="margin: 10px;">
+                {{ form.recaptcha }}
+              </div>
+                {{message}}
+                {{ form.submit(type="submit", class="button", value="Зарегистрироваться") }}
+                <div id="line"></div>
+                <a href="/login" class="button">Уже зарегистрированы?</a>
+            </form>
+        </div>
+        <div class="bottom-links glass">
+            <a href=""><img class="social" src="static/images/vk.png"></a>
+            <a href=""><img class="social" src="static/images/youtube.png"></a>
+            <a href=""><img class="social" src="static/images/instagram.png"></a>
+        </div>
+    </div>
+    <footer>© 2022, CardLearn Team. Все права защищены.</footer>
+</div>
+<script>
+    const [file] = imgInp.files
+    if (file) {
+        blah.src = URL.createObjectURL(file)
+    }
+    imgInp.onchange = evt => {
+
+        const [file] = imgInp.files
+        if (file) {
+            blah.src = URL.createObjectURL(file)
+        }
+    }
+</script>
+</body>
+</html>

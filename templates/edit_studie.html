@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <link rel="stylesheet" href="/static/css/light_theme.css">
+  </head>
+  <body>
+    <header>
+        <a href="/"><h1><span>Card</span>Learn</h1></a>
+        {% if current_user.is_authenticated %}
+        <div class="right-section">
+          <a href="/make_new_studies" class="newcard-button">+ Добавить карточку</a>
+          <a onclick="show_func()" class="under-show-button"><img id="shw-btn" class="show-more-button" src="/static/images/show-more.png" alt=""></a>
+          <div id="brgr-mnu" class="burger-menu">
+            <ul>
+              <li><a href="/myprofile">Личный кабинет</a></li>
+              <li><a href="/logout">Выход</a></li>
+            </ul>
+          </div>
+          <script>
+          function show_func() {
+            var btn = document.getElementById("shw-btn");
+            var lst =   document.getElementById("brgr-mnu");
+            if((!lst.classList.contains("show1") && !lst.classList.contains("show")) || lst.classList.contains("show1")){
+              lst.classList.remove("show1");
+              lst.classList.toggle("show");
+              btn.classList.remove("btn-rotated1");
+              btn.classList.toggle("btn-rotated");
+            }
+            else{
+              lst.classList.remove("show");
+              lst.classList.toggle("show1");
+              btn.classList.remove("btn-rotated");
+              btn.classList.toggle("btn-rotated1");
+            }
+          }
+          </script>
+          <div class="profile-border">
+              <div class="profile">
+                  <p>{{ current_user.login }}</p>
+                  <img class="userpic" src="/static/img/tmp/{{ current_user.id_foto }}.jpg" alt="">
+              </div>
+          </div>
+        </div>
+        {% else %}
+        <div class="profile-border">
+          <div class="profile">
+            <a style="margin-right: 10px" href="/register">Регистрация</a>
+             <a href="/login">Вход</a>
+          </div>
+        {% endif %}
+    </header>
+    <div class="container">
+      <div class="slides-input">
+        <h2>Сколько слайдов создаём? :)</h2>
+        <form action="" method="post" enctype="multipart/form-data">
+            <input type="text" name="n" class="search"><br>
+            {%  if n != 0 %}
+             <textarea name="main_text">{{srcs[0][1]}}</textarea>
+    <img id="blahmain_photo" src="{{srcs[0][0]}}" alt="your image" width="100px" height="100px"/>
+    <input type="file" name="main_photo" id="imgInp_main">
+    <p>Описаие</p>
+    <p><textarea name="description"></textarea></p>
+    {% for i in range(n) %}
+    <textarea name="text{{i}}">{{srcs[i+1][1]}}</textarea>
+    <img id="blah{{i}}" src="{{srcs[i+1][0]}}" alt="your image" width="100px" height="100px"/>
+    <input type="file" name="photo{{i}}" id="imgInp{{i}}">
+    {% endfor %}
+            {% for i in range(l -n, l) %}
+    <textarea name="text{{i}}"></textarea>
+    <img id="blah{{i}}" src="#" alt="your image" width="100px" height="100px"/>
+    <input type="file" name="photo{{i}}" id="imgInp{{i}}">
+    {% endfor %}
+    {% endif %}
+            <input type="submit" class="newcard-button">
+        </form>
+      </div>
+    </div>
+  </body>
+<script>
+    [file] = imgInp_main.files
+    if (file) {
+        blahmain_photo.src = URL.createObjectURL(file)
+    }
+    imgInp_main.onchange = evt => {
+
+        [file] = imgInp_main.files
+        if (file) {
+            blahmain_photo.src = URL.createObjectURL(file)
+        }
+    }
+    {% for i in range(n) %}
+    [file] = imgInp{{i}}.files
+    if (file) {
+        blah{{i}}.src = URL.createObjectURL(file)
+    }
+    imgInp{{i}}.onchange = evt => {
+
+        [file] = imgInp{{i}}.files
+        if (file) {
+            blah{{i}}.src = URL.createObjectURL(file)
+        }
+    }
+    {% endfor %}
+</script>
+</html>

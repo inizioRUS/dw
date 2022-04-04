@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8">
+    <title>Главная - CardLearn</title>
+    <link rel="stylesheet" href="static/css/light_theme.css">
+</head>
+<body>
+  <header>
+      <div class="Logo">
+        <h1>Card</h1>
+        <h1>Learn</h1>
+      </div>
+      {% if current_user.is_authenticated %}
+      <div class="right-section">
+        <a href="/make_new_studies" class="newcard-button">+ Добавить карточку</a>
+        <a onclick="show_func()" class="under-show-button"><img id="shw-btn" class="show-more-button" src="/static/images/show-more.png" alt=""></a>
+        <div id="brgr-mnu" class="burger-menu">
+          <ul>
+            <li><a href="/myprofile">Личный кабинет</a></li>
+            <li><a href="/logout">Выход</a></li>
+          </ul>
+        </div>
+        <script>
+        function show_func() {
+          var btn = document.getElementById("shw-btn");
+          var lst =   document.getElementById("brgr-mnu");
+          if((!lst.classList.contains("show1") && !lst.classList.contains("show")) || lst.classList.contains("show1")){
+            lst.classList.remove("show1");
+            lst.classList.toggle("show");
+            btn.classList.remove("btn-rotated1");
+            btn.classList.toggle("btn-rotated");
+          }
+          else{
+            lst.classList.remove("show");
+            lst.classList.toggle("show1");
+            btn.classList.remove("btn-rotated");
+            btn.classList.toggle("btn-rotated1");
+          }
+        }
+        </script>
+        <div class="profile-border">
+            <div class="profile">
+                <p>{{ current_user.login }}</p>
+                <img class="userpic" src="/static/img/tmp/{{ current_user.id_foto }}.jpg" alt="">
+            </div>
+        </div>
+      </div>
+      {% else %}
+      <div class="profile-border">
+        <div class="profile">
+          <a style="margin-right: 10px" href="/register">Регистрация</a>
+           <a href="/login">Вход</a>
+        </div>
+      </div>
+      {% endif %}
+  </header>
+<div class="container">
+    {% for i in range(data|length) %}
+    <div class="post" style="animation-delay:0.{{i}}s;">
+        <div class="post-info">
+            <a href="/view_of_studies/{{data[i].id}}">
+              <img src="/static/img/tmp/{{ data[i].main_images }}.jpg" alt="" >
+              <h2>{{ data[i].main_name }}</h2>
+            </a>
+            <p>{{ data[i].description }}</p>
+        </div>
+        <div class="post-actions">
+        {% if checks[i] %}
+        <a href="/delfollow?studie_id={{data[i].id}}&main_menu=1" class="to-favorites">
+          <img src="static/images/unlike.png" alt="">
+          <p>Отписаться</p>
+        </a>
+        {% elif current_user.is_authenticated %}
+        <a href="/follow?studie_id={{data[i].id}}&main_menu=1" class="to-favorites">
+          <img src="static/images/like.png" alt="">
+          <p>В избранное</p>
+        </a>
+          {% endif %}
+            <div class="rating">
+                <div id="rate{{i}}" class="stars">
+                    <script>
+                      let rate{{i}} = document.querySelector('#rate{{i}}');
+                      for(let i=0; i<{{ score[data[i].id] }}; i++){
+                        let addstar = document.createElement('img');
+                        addstar.setAttribute('src', 'static/images/star.png');
+                        rate{{i}}.appendChild(addstar);
+                      }
+                    </script>
+                </div>
+                <h3>{{ score[data[i].id] }}</h3>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+</body>
+</html>
