@@ -43,6 +43,9 @@ def f_insert(list, n):
         if list[i] > n:
             index = i
             break
+        if list[i] == n:
+            index = -1
+            break
     return index
 
 
@@ -73,12 +76,17 @@ def register():
                                    message="Пароли не совпадают")
         session = db_session.create_session()
         if session.query(User).filter(User.email == form.Email.data).first():
-            return render_template('register.html', title='',
+            return render_template('register.html',
                                    form=form,
                                    message="Такой пользователь уже есть")
-        image = Image(
-            image=form.photo.data.read()
-        )
+        if form.photo.data:
+            image = Image(
+                image=form.photo.data.read()
+            )
+        else:
+            image = Image(
+                image=open("static/images/img1.png", "rb").read()
+            )
         session.add(image)
         session.commit()
         user = User(
@@ -110,7 +118,7 @@ def login():
         return render_template('login.html',
                                message="Неправильный логин или пароль",
                                form=form)
-    return render_template('login.html', title='', form=form)
+    return render_template('login.html', form=form)
 
 
 @app.route('/edit_user/<int:id>', methods=['GET', 'POST'])
@@ -141,7 +149,7 @@ def edit_user(id):
         session.add(user)
         session.commit()
         return redirect("/myprofile")
-    return render_template("edit_user.html", title="anime", form=form)
+    return render_template("edit_user.html", form=form)
 
 
 # ___________________________________________________
@@ -154,61 +162,53 @@ def make_new_studies():
     if current_user.type_of_user == "basic":
         return "Отказано в доступе"
     if request.method == 'POST':
-        num = request.form.get("n")
-        data = []
-        main_text = request.form.get('main_text')
-        main_photo = request.files.get('main_photo')
-        description = request.form.get("description")
-        if main_photo:
-            main_photo = main_photo.read()
-        if not main_text or not main_photo:
+        if len(request.form) == 1:
+            num = request.form.get("n")
             if not num.isdigit():
-                num = len(request.form) - 3
-            num = min(max(0, int(num)), 100)
-            return render_template('make_new_studies.html', title="edir studies", n=int(num))
-        data.append((main_text, main_photo))
-        for i in range(len(request.form) - 3):
-            data.append([request.form.get(f'text{i}'), request.files.get(f'photo{i}').read()])
-            if not main_text or not main_photo:
-                if not num.isdigit():
-                    num = len(request.form) - 3
-                num = min(max(0, int(num)), 100)
-                return render_template('make_new_studies.html', title="edir studies", n=int(num))
-        session = db_session.create_session()
-        images_id = ""
-        texts = ""
-        for i in range(1, len(request.form) - 2):
+                num = 1
+            num = min(max(1, int(num)), 20)
+            return render_template('make_new_studies.html', n=int(num))
+        else:
+            data = []
+            main_text = request.form.get('main_text')
+            main_photo = request.files.get('main_photo').read()
+            description = request.form.get("description")
+            data.append((main_text, main_photo))
+            for i in range(len(request.form) - 2):
+                data.append([request.form.get(f'text{i}'), request.files.get(f'photo{i}').read()])
+            session = db_session.create_session()
+            images_id = ""
+            texts = ""
+            for i in range(1, len(request.form) - 1):
+                image = Image(
+                    image=data[i][1]
+                )
+                session.add(image)
+                session.commit()
+                images_id += str(image.id) + '|'
+                texts += data[i][0] + '—'
             image = Image(
-                image=data[i][1]
+                image=data[0][1]
             )
             session.add(image)
             session.commit()
-            images_id += str(image.id) + '|'
-            texts += data[i][0] + '—'
-        image = Image(
-            image=data[0][1]
-        )
-        session.add(image)
-        session.commit()
-        studie = Studie(
-            user_id=current_user.id,
-            main_images=image.id,
-            main_name=data[0][0],
-            images=images_id,
-            texts=texts,
-            made_data=datetime.datetime.now(),
-            description=description
-        )
-        session.add(studie)
-        session.commit()
-        return redirect("/")
-    return render_template('make_new_studies.html', title="edir studies", n=1)
+            studie = Studie(
+                user_id=current_user.id,
+                main_images=image.id,
+                main_name=data[0][0],
+                images=images_id,
+                texts=texts,
+                made_data=datetime.datetime.now(),
+                description=description
+            )
+            session.add(studie)
+            session.commit()
+            return redirect("/")
+    return render_template('make_new_studies.html', n=1)
 
 
 @app.route('/view_of_studies/<int:id>', methods=['GET', 'POST'])
 def view_of_studies(id):
-    if not current_user.is_authenticated:
-        return redirect("/login")
     session = db_session.create_session()
     form = Add_Commentform()
     if form.validate_on_submit():
@@ -223,84 +223,102 @@ def view_of_studies(id):
         session.commit()
     studie = session.query(Studie).filter(Studie.id == id).first()
     ratings = session.query(Rating).filter(Rating.id_studie == id).all()
-    follow_list = current_user.follow.split('|')
-    if follow_list[0] == '':
-        del follow_list[0]
-    li = list(map(int, follow_list))
-    check = studie.id in li
+    check = False
+    if current_user.is_authenticated:
+        follow_list = current_user.follow.split('|')
+        if follow_list[0] == '':
+            del follow_list[0]
+        follow_list = list(map(int, follow_list))
+        check = studie.id in follow_list
     if len(ratings) > 0:
         score = round(sum(i.score for i in ratings) / len(ratings), 1)
     else:
         score = 0
-    check_edit = studie.id in list(map(lambda x: x.id, current_user.studies)) or current_user.type_of_user == "SAdmin"
+    check_edit = False
+    if current_user.is_authenticated:
+        check_edit = studie.id in list(
+            map(lambda x: x.id, current_user.studies)) or current_user.type_of_user == "SAdmin"
     images = studie.images.split('|')[:-1]
-    images.append(current_user.image.id)
+    k = 0
+    if current_user.is_authenticated:
+        images.append(current_user.image.id)
+        k = 1
     texts = studie.texts.split('—')[:-1]
-    commets = session.query(Comment).filter(Comment.studie_id == id).all()
-    images.extend([i.user.id_foto for i in commets])
+    comments = session.query(Comment).filter(Comment.studie_id == id).all()
+    images.extend([i.user.id_foto for i in comments])
+    len_img = 0
     for i in images:
         img = session.query(Image).filter(Image.id == int(i)).first()
         out = open(f"static/img/tmp/{i}.jpg", "wb")
         out.write(img.image)
+        len_img += 1
         out.close()
-    images = images[:-1]
-    return render_template('view_of_studies.html', title="view_of_studies",
-                           n=len(images) - len([i.user.id_foto for i in commets]), imgs=images, texts=texts,
-                           commets=commets, form=form, id=id, score=score, check=check, check_edit=check_edit)
+    images = images[:len(images) - k]
+    len_img -= k
+    person_score = 0
+    if current_user.is_authenticated:
+        person_rat = session.query(Rating).filter(Rating.id_studie == id, Rating.id_user == current_user.id).first()
+        if person_rat:
+            person_score = person_rat.score
+    print(person_score)
+    return render_template('view_of_studies.html',
+                           n=len_img - len(comments), imgs=images, texts=texts,
+                           comments=comments, form=form, id=id, score=score, check=check, check_edit=check_edit,
+                           person_score=person_score)
 
 
-@app.route('/edit_studie/<int:id>', methods=['GET', 'POST'])
-def edit_studie(id):
-    if not current_user.is_authenticated:
-        return redirect("/login")
-    session = db_session.create_session()
-    studie = session.query(Studie).filter(Studie.id == id).first()
-    if current_user.id != studie.user_id:
-        return "Отказано в доступе"
-    if request.method == 'POST':
-        pass
-
-    images = studie.images.split('|')[:-1]
-    texts = studie.texts.split('—')[:-1]
-    srcs = []
-    out = open(f"static/img/tmp/{studie.image.id}.jpg", "wb")
-    out.write(studie.image.image)
-    out.close()
-    srcs.append((f"/static/img/tmp/{studie.image.id}.jpg", studie.description))
-    ind = 0
-    for i in images:
-        img = session.query(Image).filter(Image.id == int(i)).first()
-        out = open(f"static/img/tmp/{str(img.id)}.jpg", "wb")
-        out.write(img.image)
-        out.close()
-        srcs.append((f"/static/img/tmp/{str(img.id)}.jpg", texts[ind]))
-        ind += 1
-    l = len(srcs)
-    return render_template("edit_studie.html", title="anime", srcs=srcs, l=l, n=l - 1)
+# @app.route('/edit_studie/<int:id>', methods=['GET', 'POST'])
+# def edit_studie(id):
+#    if not current_user.is_authenticated:
+#        return redirect("/login")
+#    session = db_session.create_session()
+#    studie = session.query(Studie).filter(Studie.id == id).first()
+#    if current_user.id != studie.user_id:
+#        return "Отказано в доступе"
+#    if request.method == 'POST':
+#        pass
+#
+#    images = studie.images.split('|')[:-1]
+#    texts = studie.texts.split('—')[:-1]
+#    srcs = []
+#    out = open(f"static/img/tmp/{studie.image.id}.jpg", "wb")
+#    out.write(studie.image.image)
+#    out.close()
+#    srcs.append((f"/static/img/tmp/{studie.image.id}.jpg", studie.description))
+#    ind = 0
+#    for i in images:
+#        img = session.query(Image).filter(Image.id == int(i)).first()
+#        out = open(f"static/img/tmp/{str(img.id)}.jpg", "wb")
+#        out.write(img.image)
+#        out.close()
+#        srcs.append((f"/static/img/tmp/{str(img.id)}.jpg", texts[ind]))
+#        ind += 1
+#    l = len(srcs)
+#    return render_template("edit_studie.html", title="anime", srcs=srcs, l=l, n=l - 1)
 
 
 # ___________________________________________
 
 # Отображение профиля, админ панель, главный экран
-@app.route('/myprofile/<int:id>', methods=['GET', 'POST'])
+@app.route('/profile/<int:id>', methods=['GET', 'POST'])
 def myprofile(id):
     if not current_user.is_authenticated:
         return redirect("/login")
     session = db_session.create_session()
     user = session.query(User).filter(User.id == id).first()
     checks = []
-    li = user.follow.split('|')
-    if li[0] == '':
-        del li[0]
-    li = list(map(int, li))
-    studies = session.query(Studie).filter(Studie.id.in_(li)).all()
+    follow_list = user.follow.split('|')
+    if follow_list[0] == '':
+        del follow_list[0]
+    follow_list = list(map(int, follow_list))
+    studies = session.query(Studie).filter(Studie.id.in_(follow_list)).all()
     for i in studies:
-        checks.append(i.id in li)
+        checks.append(i.id in follow_list)
     my_studies = user.studies
     out = open(f"static/img/tmp/{user.image.id}.jpg", "wb")
     out.write(user.image.image)
     out.close()
-    return render_template("myprofile.html", title="anime", data=user, studies=studies, my_studies=my_studies,
+    return render_template("myprofile.html", data=user, studies=studies, my_studies=my_studies,
                            checks=checks)
 
 
@@ -311,7 +329,7 @@ def adminpanel():
     if user.type_of_user == 'admin' or user.type_of_user == 'SAdmin':
         data = session.query(User).all()
         comments = session.query(Comment).filter(Comment.check_this).all()
-        return render_template("admin_panel.html", title="admin", data=data, current_user=current_user,
+        return render_template("admin_panel.html", data=data, current_user=current_user,
                                comments=comments)
     else:
         return "Отказано в доступе"
@@ -376,17 +394,27 @@ def follow():
         return redirect("/login")
     session = db_session.create_session()
     num = int(request.args.get('studie_id'))
+    n = int(request.args.get('main_menu'))
     li = current_user.follow.split('|')
     if li[0] == '':
         del li[0]
     li = list(map(int, li))
     ind = f_insert(li, num)
+    if ind == -1:
+        if n == 1:
+            return redirect(f"/")
+        elif n == 2:
+            return redirect(f"/profile/{current_user.id}")
+        else:
+            return redirect(f"/view_of_studies/{num}")
     li.insert(ind, num)
     user = session.query(User).filter(User.id == current_user.id).first()
     user.follow = "|".join(list(map(str, li)))
     session.commit()
-    if request.args.get('main_menu'):
+    if n == 1:
         return redirect(f"/")
+    elif n == 2:
+        return redirect(f"/profile/{current_user.id}")
     else:
         return redirect(f"/view_of_studies/{num}")
 
@@ -396,15 +424,35 @@ def delfollow():
     if not current_user.is_authenticated:
         return redirect("/login")
     session = db_session.create_session()
+    n = int(request.args.get('main_menu'))
     num = int(request.args.get('studie_id'))
-    li = list(map(int, current_user.follow.split("|")))
+    li = current_user.follow.split('|')
+    if li[0] == '':
+        del li[0]
+    li = list(map(int, li))
     ind = search_follow(li, num)
+    if len(li) <= ind:
+        if n == 1:
+            return redirect(f"/")
+        elif n == 2:
+            return redirect(f"/profile/{current_user.id}")
+        else:
+            return redirect(f"/view_of_studies/{num}")
+    if num != li[ind]:
+        if n == 1:
+            return redirect(f"/")
+        elif n == 2:
+            return redirect(f"/profile/{current_user.id}")
+        else:
+            return redirect(f"/view_of_studies/{num}")
     del li[ind]
     user = session.query(User).filter(User.id == current_user.id).first()
     user.follow = "|".join(list(map(str, li)))
     session.commit()
-    if request.args.get('main_menu'):
+    if n == 1:
         return redirect(f"/")
+    elif n == 2:
+        return redirect(f"/profile/{current_user.id}")
     else:
         return redirect(f"/view_of_studies/{num}")
 
@@ -465,8 +513,23 @@ def delstudie(id):
         return redirect("/login")
     session = db_session.create_session()
     studie = session.query(Studie).filter(Studie.id == id).first()
+
     if current_user.id != studie.user_id:
         return "Отказано в доступе"
+    users = session.query(User).all()
+    for i in users:
+        li = i.follow.split('|')
+        if li[0] == '':
+            del li[0]
+        li = list(map(int, li))
+        ind = search_follow(li, id)
+        if len(li) <= ind:
+            continue
+        if id != li[ind]:
+            continue
+        del li[ind]
+        i.follow = "|".join(list(map(str, li)))
+        session.commit()
     for i in studie.commemts:
         session.delete(i)
     for j in studie.images.split("|")[:-1]:

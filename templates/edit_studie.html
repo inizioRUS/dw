@@ -6,51 +6,57 @@
     <link rel="stylesheet" href="/static/css/light_theme.css">
   </head>
   <body>
-    <header>
-        <a href="/"><h1><span>Card</span>Learn</h1></a>
-        {% if current_user.is_authenticated %}
-        <div class="right-section">
-          <a href="/make_new_studies" class="newcard-button">+ Добавить карточку</a>
-          <a onclick="show_func()" class="under-show-button"><img id="shw-btn" class="show-more-button" src="/static/images/show-more.png" alt=""></a>
-          <div id="brgr-mnu" class="burger-menu">
-            <ul>
-              <li><a href="/myprofile">Личный кабинет</a></li>
-              <li><a href="/logout">Выход</a></li>
-            </ul>
-          </div>
-          <script>
-          function show_func() {
-            var btn = document.getElementById("shw-btn");
-            var lst =   document.getElementById("brgr-mnu");
-            if((!lst.classList.contains("show1") && !lst.classList.contains("show")) || lst.classList.contains("show1")){
-              lst.classList.remove("show1");
-              lst.classList.toggle("show");
-              btn.classList.remove("btn-rotated1");
-              btn.classList.toggle("btn-rotated");
-            }
-            else{
-              lst.classList.remove("show");
-              lst.classList.toggle("show1");
-              btn.classList.remove("btn-rotated");
-              btn.classList.toggle("btn-rotated1");
-            }
-          }
-          </script>
-          <div class="profile-border">
-              <div class="profile">
-                  <p>{{ current_user.login }}</p>
-                  <img class="userpic" src="/static/img/tmp/{{ current_user.id_foto }}.jpg" alt="">
-              </div>
-          </div>
-        </div>
-        {% else %}
-        <div class="profile-border">
-          <div class="profile">
-            <a style="margin-right: 10px" href="/register">Регистрация</a>
-             <a href="/login">Вход</a>
-          </div>
+      <header>
+      <div class="Logo">
+        <h1>Card</h1>
+        <h1>Learn</h1>
+      </div>
+      {% if current_user.is_authenticated %}
+      <div class="right-section">
+        {% if current_user.type_of_user != "basic" %}
+        <a href="/make_new_studies" class="newcard-button">+ Добавить карточку</a>
         {% endif %}
-    </header>
+        <a onclick="show_func()" class="under-show-button"><img id="shw-btn" class="show-more-button" src="/static/images/show-more.png" alt=""></a>
+        <div id="brgr-mnu" class="burger-menu">
+          <ul>
+            <li><a href="/profile/{{current_user.id}}">Личный кабинет</a></li>
+            <li><a href="/logout">Выход</a></li>
+          </ul>
+        </div>
+        <script>
+        function show_func() {
+          var btn = document.getElementById("shw-btn");
+          var lst =   document.getElementById("brgr-mnu");
+          if((!lst.classList.contains("show1") && !lst.classList.contains("show")) || lst.classList.contains("show1")){
+            lst.classList.remove("show1");
+            lst.classList.toggle("show");
+            btn.classList.remove("btn-rotated1");
+            btn.classList.toggle("btn-rotated");
+          }
+          else{
+            lst.classList.remove("show");
+            lst.classList.toggle("show1");
+            btn.classList.remove("btn-rotated");
+            btn.classList.toggle("btn-rotated1");
+          }
+        }
+        </script>
+        <div class="profile-border">
+            <div class="profile">
+                <p>{{ current_user.login }}</p>
+                <img class="userpic" src="/static/img/tmp/{{ current_user.id_foto }}.jpg" alt="">
+            </div>
+        </div>
+      </div>
+      {% else %}
+      <div class="profile-border">
+        <div class="profile">
+          <a style="margin-right: 10px" href="/register">Регистрация</a>
+           <a href="/login">Вход</a>
+        </div>
+      </div>
+      {% endif %}
+  </header>
     <div class="container">
       <div class="slides-input">
         <h2>Сколько слайдов создаём? :)</h2>

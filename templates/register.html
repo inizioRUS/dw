@@ -10,14 +10,11 @@
 <div class="container">
     <div class="log-block">
         <div class="login glass">
-            <div class="logo">
-                <h1><span>Card</span>Learn</h1>
-            </div>
+            <h1><span>Card</span>Learn</h1>
             <h2>Регистрация</h2>
             <form action="" method="post"
                   enctype="multipart/form-data">
                 {{ form.hidden_tag() }}
-                {{ form.csrf_token }}
                 <div class="form-input">
                     <label for="login">EMail Address</label>
                     {{ form.Email(class="input-field", type="email", placeholder="Почтовый ящик") }}
@@ -41,21 +38,7 @@
                 <div class="form-input">
                     <label for="password">Password</label>
                     {{ form.Password(id="pswrd", class="input-field" , type="password", placeholder="Пароль") }}
-                    <a class="password-control" onclick="return show_hide_password(this);"></a>
-                    <script>
-                      function show_hide_password(target){
-                      var input = document.getElementById('pswrd');
-                      if (input.getAttribute('type') == 'password') {
-                      target.classList.add('view');
-                      input.setAttribute('type', 'text');
-                      } else {
-                      target.classList.remove('view');
-                      input.setAttribute('type', 'password');
-                      }
-                      return false;
-                      }
-                    </script>
-
+                    <label class="show-password" for="show_password"><input type="checkbox" id="show_password" value="">Показать пароль</label>
                     {% for error in form.Password.errors %}
                     <p class="alert alert-danger" role="alert">
                         {{ error }}
@@ -65,8 +48,8 @@
 
                 <div class="form-input">
                     <label for="password">Password verification</label>
-                    {{ form.Password_again(class="input-field" , type="password", placeholder="Повтор пароля")
-                    }}
+                    {{ form.Password_again(id="pswrd1", class="input-field" , type="password", placeholder="Повтор пароля") }}
+                    <label class="show-password" for="show_password1"><input type="checkbox" id="show_password1" value="">Показать пароль</label>
                     {% for error in form.Password_again.errors %}
                     <p class="alert alert-danger" role="alert">
                         {{ error }}
@@ -130,6 +113,27 @@
             blah.src = URL.createObjectURL(file)
         }
     }
+</script>
+<script>
+    let password_input = document.getElementById('pswrd');
+let chkbx = document.getElementById('show_password');
+chkbx.onclick = function show_hide_password1() {
+    if (chkbx.checked) {
+        password_input.type = "text";
+    } else {
+        password_input.type = "password";
+    }
+}
+let password_input1 = document.getElementById('pswrd1');
+let chkbx1 = document.getElementById('show_password1');
+chkbx1.onclick = function show_hide_password1(){
+  if(chkbx1.checked){
+    password_input1.type = "text";
+  }
+  else{
+    password_input1.type = "password";
+  }
+}
 </script>
 </body>
 </html>

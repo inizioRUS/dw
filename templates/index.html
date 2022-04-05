@@ -13,11 +13,13 @@
       </div>
       {% if current_user.is_authenticated %}
       <div class="right-section">
+        {% if current_user.type_of_user != "basic" %}
         <a href="/make_new_studies" class="newcard-button">+ Добавить карточку</a>
+        {% endif %}
         <a onclick="show_func()" class="under-show-button"><img id="shw-btn" class="show-more-button" src="/static/images/show-more.png" alt=""></a>
         <div id="brgr-mnu" class="burger-menu">
           <ul>
-            <li><a href="/myprofile">Личный кабинет</a></li>
+            <li><a href="/profile/{{current_user.id}}">Личный кабинет</a></li>
             <li><a href="/logout">Выход</a></li>
           </ul>
         </div>
@@ -96,3 +98,4 @@
 </div>
 </body>
 </html>
+

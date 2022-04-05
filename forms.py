@@ -3,7 +3,7 @@ from flask_wtf.file import FileRequired, FileAllowed, DataRequired
 from wtforms import TextAreaField, PasswordField, SubmitField, BooleanField, RadioField, FileField, \
     SelectField, TextAreaField, EmailField, StringField, FieldList, FormField
 
-list_of_type = ['jpg', 'png', 'jpeg']
+list_of_type = ['jpg', 'png', 'jpeg', 'gif']
 
 
 class RegisterForm(FlaskForm):
@@ -13,7 +13,7 @@ class RegisterForm(FlaskForm):
     Surname = StringField('Surname', validators=[DataRequired()])
     Login = StringField('Login', validators=[DataRequired()])
     Name = StringField('Name', validators=[DataRequired()])
-    photo = FileField(validators=[FileAllowed(list_of_type), DataRequired()])
+    photo = FileField(validators=[FileAllowed(list_of_type)])
     recaptcha = RecaptchaField()
     submit = SubmitField('Sumbit')
 
@@ -21,7 +21,7 @@ class RegisterForm(FlaskForm):
 class Edit_form(FlaskForm):
     Surname = StringField('Surname')
     Login = StringField('Login')
-    Name = StringField('Name',)
+    Name = StringField('Name', )
     photo = FileField(validators=[FileAllowed(list_of_type)])
     submit = SubmitField('Sumbit')
 
@@ -33,17 +33,7 @@ class LoginForm(FlaskForm):
     submit = SubmitField('Sign in')
 
 
-class one_studiesFrom(FlaskForm):
-    photo = FileField(validators=[FileAllowed(list_of_type)])
-    text = TextAreaField("Text")
-
-
-class Make_new_stadiesForm(FlaskForm):
-    Number = TextAreaField('Number', validators=[DataRequired()], default=1)
-    submit = SubmitField('Submit')
-
-
 class Add_Commentform(FlaskForm):
-    text = TextAreaField("Text")
+    text = TextAreaField("Text", validators=[DataRequired()])
     recaptcha = RecaptchaField()
     submit = SubmitField('Sumbit')

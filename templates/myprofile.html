@@ -6,55 +6,57 @@
     <link rel="stylesheet" href="/static/css/light_theme.css">
   </head>
   <body>
-    <header>
-        <a href="/" class="Logo">
-          <h1>Card</h1>
-          <h1>Learn</h1>
-        </a>
-        {% if current_user.is_authenticated %}
-        <div class="right-section">
-          <a href="/make_new_studies" class="newcard-button">+ Добавить карточку</a>
-          <a onclick="show_func()" class="under-show-button"><img id="shw-btn" class="show-more-button" src="/static/images/show-more.png" alt=""></a>
-          <div id="brgr-mnu" class="burger-menu">
-            <ul>
-              <li><a href="/myprofile">Личный кабинет</a></li>
-              <li><a href="/logout">Выход</a></li>
-            </ul>
-          </div>
-          <script>
-          function show_func() {
-            var btn = document.getElementById("shw-btn");
-            var lst =   document.getElementById("brgr-mnu");
-            if((!lst.classList.contains("show1") && !lst.classList.contains("show")) || lst.classList.contains("show1")){
-              lst.classList.remove("show1");
-              lst.classList.toggle("show");
-              btn.classList.remove("btn-rotated1");
-              btn.classList.toggle("btn-rotated");
-            }
-            else{
-              lst.classList.remove("show");
-              lst.classList.toggle("show1");
-              btn.classList.remove("btn-rotated");
-              btn.classList.toggle("btn-rotated1");
-            }
-          }
-          </script>
-          <div class="profile-border">
-              <div class="profile">
-                  <p>{{ current_user.login }}</p>
-                  <img class="userpic" src="/static/img/tmp/{{ current_user.id_foto }}.jpg" alt="">
-              </div>
-          </div>
-        </div>
-        {% else %}
-        <div class="profile-border">
-          <div class="profile">
-            <a style="margin-right: 10px" href="/register">Регистрация</a>
-             <a href="/login">Вход</a>
-          </div>
-        </div>
+      <header>
+      <a href="/" class="Logo">
+        <h1>Card</h1>
+        <h1>Learn</h1>
+      </a>
+      {% if current_user.is_authenticated %}
+      <div class="right-section">
+        {% if current_user.type_of_user != "basic" %}
+        <a href="/make_new_studies" class="newcard-button">+ Добавить карточку</a>
         {% endif %}
-    </header>
+        <a onclick="show_func()" class="under-show-button"><img id="shw-btn" class="show-more-button" src="/static/images/show-more.png" alt=""></a>
+        <div id="brgr-mnu" class="burger-menu">
+          <ul>
+            <li><a href="/profile/{{current_user.id}}">Личный кабинет</a></li>
+            <li><a href="/logout">Выход</a></li>
+          </ul>
+        </div>
+        <script>
+        function show_func() {
+          var btn = document.getElementById("shw-btn");
+          var lst =   document.getElementById("brgr-mnu");
+          if((!lst.classList.contains("show1") && !lst.classList.contains("show")) || lst.classList.contains("show1")){
+            lst.classList.remove("show1");
+            lst.classList.toggle("show");
+            btn.classList.remove("btn-rotated1");
+            btn.classList.toggle("btn-rotated");
+          }
+          else{
+            lst.classList.remove("show");
+            lst.classList.toggle("show1");
+            btn.classList.remove("btn-rotated");
+            btn.classList.toggle("btn-rotated1");
+          }
+        }
+        </script>
+        <div class="profile-border">
+            <div class="profile">
+                <p>{{ current_user.login }}</p>
+                <img class="userpic" src="/static/img/tmp/{{ current_user.id_foto }}.jpg" alt="">
+            </div>
+        </div>
+      </div>
+      {% else %}
+      <div class="profile-border">
+        <div class="profile">
+          <a style="margin-right: 10px" href="/register">Регистрация</a>
+           <a href="/login">Вход</a>
+        </div>
+      </div>
+      {% endif %}
+  </header>
     <div class="container clmn">
       <div class="profile-info">
         <div style="display: flex; flex-direction: column; align-items: center;">
@@ -64,11 +66,11 @@
           {% endif %}
         </div>
         <div class="profile-info-list">
-          <p>Никнейм : {{data.login}}</p>
-          <p>Фамилия : {{data.surname}}</p>
-          <p>Имя : {{data.name}}</p>
-          <p>Статус аккаунта : {{data.type_of_user}}</p>
-          <p>Дата регистрации : {{data.data_reg.strftime('%Y-%m-%d')}}</p>
+          <p>Никнейм :  <span>{{data.login}}</span></p>
+          <p>Фамилия :  <span>{{data.surname}}</span></p>
+          <p>Имя :  <span>{{data.name}}</span></p>
+          <p>Статус аккаунта :  <span>{{data.type_of_user}}</span></p>
+          <p>Дата регистрации :  <span>{{data.data_reg.strftime('%Y-%m-%d')}}</span></p>
 
         </div>
       </div>
@@ -80,20 +82,20 @@
             <div class="post in-profile" style="animation-delay:0.{{i}}s;">
                 <div class="post-info">
                     <a href="/view_of_studies/{{studies[i].id}}">
-                        <img class="postimg" src="/static/img/tmp/{{ studies[i].main_images }}.jpg" alt="">
+                        <img class="post" src="/static/img/tmp/{{ studies[i].main_images }}.jpg" alt="">
                         <h2>{{ studies[i].main_name }}</h2>
                     </a>
                     <p> {{ studies[i].description }}</p>
                 </div>
                 <div class="post-actions">
                 {% if checks[i] %}
-                <a href="/delfollow?studie_id={{studies[i].id}}&main_menu=1" class="to-favorites">
-                  <img src="static/images/unlike.png" alt="">
+                <a href="/delfollow?studie_id={{studies[i].id}}&main_menu=2" class="to-favorites">
+                  <img src="/static/images/unlike.png" alt="">
                   <p>Отписаться</p>
                 </a>
                 {% elif current_user.is_authenticated %}
-                <a href="/follow?studie_id={{studies[i].id}}&main_menu=1" class="to-favorites">
-                  <img src="static/images/like.png" alt="">
+                <a href="/follow?studie_id={{studies[i].id}}&main_menu=2" class="to-favorites">
+                  <img src="/static/images/like.png" alt="">
                   <p>В избранное</p>
                 </a>
                   {% endif %}
@@ -113,24 +115,26 @@
             <div class="post in-profile" style="animation-delay:0.{{i}}s;">
                 <div class="post-info">
                     <a href="/view_of_studies/{{my_studies[i].id}}">
-                        <img class="postimg" src="/static/img/tmp/{{ my_studies[i].main_images }}.jpg" alt="">
+                        <img class="post" src="/static/img/tmp/{{ my_studies[i].main_images }}.jpg" alt="">
                         <h2>{{ my_studies[i].main_name }}</h2>
                     </a>
                     <p> {{my_studies[i].description }}</p>
                 </div>
+                {% if current_user.id == data.id %}
                 <div class="post-actions">
                 {% if checks[i] %}
-                <a href="/delfollow?studie_id={{my_studies[i].id}}&main_menu=1" class="to-favorites">
-                  <img src="static/images/unlike.png" alt="">
+                <a href="/delfollow?studie_id={{my_studies[i].id}}&main_menu=2" class="to-favorites">
+                  <img src="/static/images/unlike.png" alt="">
                   <p>Отписаться</p>
                 </a>
                 {% elif current_user.is_authenticated %}
-                <a href="/follow?studie_id={{my_studies[i].id}}&main_menu=1" class="to-favorites">
-                  <img src="static/images/like.png" alt="">
+                <a href="/follow?studie_id={{my_studies[i].id}}&main_menu=2" class="to-favorites">
+                  <img src="/static/images/like.png" alt="">
                   <p>В избранное</p>
                 </a>
                   {% endif %}
                 </div>
+                 {% endif %}
             </div>
             {% endfor %}
           </div>

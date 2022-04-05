@@ -6,125 +6,167 @@
     <link rel="stylesheet" href="/static/css/light_theme.css">
   </head>
   <body>
-    <header>
-        <a href="/" class="Logo">
-          <h1>Card</h1>
-          <h1>Learn</h1>
-        </a>
-        {% if current_user.is_authenticated %}
-        <div class="right-section">
-          <a href="/make_new_studies" class="newcard-button">+ Добавить карточку</a>
-          <a onclick="show_func()" class="under-show-button"><img id="shw-btn" class="show-more-button" src="/static/images/show-more.png" alt=""></a>
-          <div id="brgr-mnu" class="burger-menu">
-            <ul>
-              <li><a href="/myprofile">Личный кабинет</a></li>
-              <li><a href="/logout">Выход</a></li>
-            </ul>
-          </div>
-          <script>
-          function show_func() {
-            var btn = document.getElementById("shw-btn");
-            var lst =   document.getElementById("brgr-mnu");
-            if((!lst.classList.contains("show1") && !lst.classList.contains("show")) || lst.classList.contains("show1")){
-              lst.classList.remove("show1");
-              lst.classList.toggle("show");
-              btn.classList.remove("btn-rotated1");
-              btn.classList.toggle("btn-rotated");
-            }
-            else{
-              lst.classList.remove("show");
-              lst.classList.toggle("show1");
-              btn.classList.remove("btn-rotated");
-              btn.classList.toggle("btn-rotated1");
-            }
-          }
-          </script>
-          <div class="profile-border">
-              <div class="profile">
-                  <p>{{ current_user.login }}</p>
-                  <img class="userpic" src="/static/img/tmp/{{ current_user.id_foto }}.jpg" alt="">
-              </div>
-          </div>
-        </div>
-        {% else %}
-        <div class="profile-border">
-          <div class="profile">
-            <a style="margin-right: 10px" href="/register">Регистрация</a>
-             <a href="/login">Вход</a>
-          </div>
+     <header>
+      <a href="/" class="Logo">
+        <h1>Card</h1>
+        <h1>Learn</h1>
+      </a>
+      {% if current_user.is_authenticated %}
+      <div class="right-section">
+        {% if current_user.type_of_user != "basic" %}
+        <a href="/make_new_studies" class="newcard-button">+ Добавить карточку</a>
         {% endif %}
-    </header>
-    <div class="container clmn">
+        <a onclick="show_func()" class="under-show-button"><img id="shw-btn" class="show-more-button" src="/static/images/show-more.png" alt=""></a>
+        <div id="brgr-mnu" class="burger-menu">
+          <ul>
+            <li><a href="/profile/{{current_user.id}}">Личный кабинет</a></li>
+            <li><a href="/logout">Выход</a></li>
+          </ul>
+        </div>
+        <script>
+        function show_func() {
+          var btn = document.getElementById("shw-btn");
+          var lst =   document.getElementById("brgr-mnu");
+          if((!lst.classList.contains("show1") && !lst.classList.contains("show")) || lst.classList.contains("show1")){
+            lst.classList.remove("show1");
+            lst.classList.toggle("show");
+            btn.classList.remove("btn-rotated1");
+            btn.classList.toggle("btn-rotated");
+          }
+          else{
+            lst.classList.remove("show");
+            lst.classList.toggle("show1");
+            btn.classList.remove("btn-rotated");
+            btn.classList.toggle("btn-rotated1");
+          }
+        }
+        </script>
+        <div class="profile-border">
+            <div class="profile">
+                <p>{{ current_user.login }}</p>
+                <img class="userpic" src="/static/img/tmp/{{ current_user.id_foto }}.jpg" alt="">
+            </div>
+        </div>
+      </div>
+      {% else %}
+      <div class="profile-border">
+        <div class="profile">
+          <a style="margin-right: 10px" href="/register">Регистрация</a>
+           <a href="/login">Вход</a>
+        </div>
+      </div>
+      {% endif %}
+  </header>
+  <div class="container clmn">
+    <div class="slides-block">
       {% for i in range(n) %}
       <div class="slides-input">
-        <div style="padding-top: 50px">
-            <img src="/static/img/tmp/{{ imgs[i] }}.jpg" width="400px">
-            <p>{{ texts[i] }}</p>
-        </div>
+        <img src="/static/img/tmp/{{ imgs[i] }}.jpg">
+        <p>{{ texts[i] }}</p>
       </div>
       {% endfor %}
-      {% for i in range(commets|length) %}
-        <a href="/myprofile/{{commets[i].user_id}}">
-      <div class="">
-          {{commets[i].user.login}}
-      </div>
-      <div style="padding-top: 50px">
-          {{commets[i].text}}
-          <img src="/static/img/tmp/{{ commets[i].user.id_foto}}.jpg" width="50px" , height="50px">
-      </div>
-            </a>
-      <div>
-          {% if current_user.id == commets[i].user_id or current_user.type_of_user == "admin" or current_user.type_of_user == "SAdmin"%}
-          <a href="/delcomment?studie_id={{id}}&val={{commets[i].id}}" id="{{commets[i].id}}">
-              <button>УДалить</button>
-          </a>
-          {% endif %}
-          <a href="/addcheck?studie_id={{id}}&val={{commets[i].id}}" id="{{commets[i].id}}">
-              <button>Пожаловаться</button>
-          </a>
-      </div>
-      {% endfor %}
-      {% if check_edit %}
-      <a href="/delstudie/{{id}}">
-          <button>Удалить</button>
-      </a>
-      {% endif %}
-      <a href="/ratings?studie_id={{id}}&val=1">
-          <button>1</button>
-      </a>
-      <a href="/ratings?studie_id={{id}}&val=2">
-          <button>2</button>
-      </a>
-      <a href="/ratings?studie_id={{id}}&val=3">
-          <button>3</button>
-      </a>
-      <a href="/ratings?studie_id={{id}}&val=4">
-          <button>4</button>
-      </a>
-      <a href="/ratings?studie_id={{id}}&val=5">
-          <button>5</button>
-      </a>
-      <p>{{score}}</p>
-      {% if check %}
-      <a href="/delfollow?studie_id={{id}}">
-          <button>Удалить из избранного</button>
-      </a>
-      {% else %}
-      <a href="/follow?studie_id={{id}}">
-          <button>Добавить в избранное</button>
-      </a>
-      {% endif %}
-      <form action="" method="post"
-            style="padding-top:10%;padding-bottom:10% ; background: #e0e0e0;    text-align: center;"
-            enctype="multipart/form-data">
-          {{ form.hidden_tag() }}
-          {{ form.csrf_token }}
-          <p> {{ form.text.label }}{{form.text}}</p>
-          <div style="  display: flex;
-        justify-content: center;">{{ form.recaptcha }}
-          </div>
-          <p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>
-      </form>
     </div>
+    {% if current_user.is_authenticated %}
+    <div class="social-controls">
+      <div class="default-actions">
+        {% if check %}
+        <a href="/delfollow?studie_id={{id}}" class="to-favorites-post">
+          <img src="/static/images/unlike.png" alt="">
+          <h2>Удалить из избр.</h2>
+        </a>
+        {% else %}
+        <a href="/follow?studie_id={{id}}" class="to-favorites-post">
+          <img src="/static/images/like.png" alt="">
+          <h2>Добавить в избр.</h2>
+        </a>
+        {% endif %}
+        <div class="rate-post">
+            <div class="rate-post-body">
+              <a href="/ratings?studie_id={{id}}&val=1">
+                  <img src="/static/images/star.png" alt="">
+              </a>
+              <a href="/ratings?studie_id={{id}}&val=2">
+                  <img src="/static/images/star.png" alt="">
+              </a>
+              <a href="/ratings?studie_id={{id}}&val=3">
+                  <img src="/static/images/star.png" alt="">
+              </a>
+              <a href="/ratings?studie_id={{id}}&val=4">
+                  <img src="/static/images/star.png" alt="">
+              </a>
+              <a href="/ratings?studie_id={{id}}&val=5">
+                  <img src="/static/images/star.png" alt="">
+              </a>
+            </div>
+          </div>
+          <div id="dynamic_score" class="score-post">
+            <div id="dynamic_score1" class="score-post-body">
+              {{score}}
+            </div>
+          </div>
+        </div>
+        <div class="add-comment-post">
+        <form action="" method="post" enctype="multipart/form-data">
+          <div class="add-comment-input">
+            <div class="mini-prof-and-comm">
+              <div class="mini-profile-comment">
+                <img class="userpic" src="/static/img/tmp/{{ current_user.id_foto }}.jpg" alt="">
+                <p>{{ current_user.login }}</p>
+                <div style="border-radius: 40px; overflow: hidden;">
+                  {{ form.recaptcha }}
+                </div>
+              </div>
+              {{ form.hidden_tag() }}
+              {{form.text(class="text-field let-comm", placeholder="Написать комментарий...")}}
+            </div>
+          </div>
+            <div class="send-comment-post">
+              {{ form.submit(type="submit", class="send-comm-button", value="") }}
+            </div>
+        </form>
+        </div>
+        </div>
+      {% endif %}
+    <div class="comments-section">
+          {% for i in range(comments|length) %}
+          <div class="comment">
+            <a href="/profile/{{comments[i].user_id}}">
+              <img src="/static/img/tmp/{{ comments[i].user.id_foto}}.jpg">
+            </a>
+            <div class="comment-info">
+              <a href="/profile/{{comments[i].user_id}}">
+                <h3>{{comments[i].user.login}}</h3>
+              </a>
+              <p>{{comments[i].text}}</p>
+            </div>
+            {% if current_user.id == comments[i].user_id or current_user.type_of_user == "admin" or current_user.type_of_user == "SAdmin"%}
+            <div class="comment-actions">
+              <a href="/addcheck?studie_id={{id}}&val={{comments[i].id}}" id="{{comments[i].id}}">
+                  <img src="/static/images/report.png" alt="">
+              </a>
+              <a href="/delcomment?studie_id={{id}}&val={{comments[i].id}}" id="{{comments[i].id}}">
+                  <img src="/static/images/delete.png" alt="">
+              </a>
+            </div>
+            {% endif %}
+          </div>
+          {% endfor %}
+    </div>
+  </div>
+  </div>
+  </div>
+  <script>
+    let score = {{score}};
+    let brdr = document.getElementById('dynamic_score');
+    let inner_brdr = document.getElementById('dynamic_score1');
+    if(score<2.5){
+      brdr.style.background = `rgb(192, ${ score*70 }, 0)`;
+      inner_brdr.style.background = `rgb(120, ${ score*48 }, 0)`;
+    }
+    else{
+      brdr.style.background = `rgb(${ 192-(score-2.5)*70 }, 192, 0)`;
+      inner_brdr.style.background = `rgb(${ 120-(score-2.5)*48 }, 120, 0)`;
+    }
+  </script>
   </body>
 </html>

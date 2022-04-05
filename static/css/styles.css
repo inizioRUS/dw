@@ -42,6 +42,7 @@ body{
 }
 
 form{
+  width: 100%;
   display: flex;
     flex-direction: column;
     flex-wrap: wrap;
@@ -105,6 +106,7 @@ footer{
 }
 
 .login{
+  max-width: 800px;
   padding: 50px;
   border-radius: 40px;
   z-index: 1000;
@@ -114,6 +116,7 @@ footer{
   justify-content: center;
   align-items: stretch;
   align-content: center;
+  align-items: center;
 }
 
 #line{
@@ -195,18 +198,19 @@ footer{
 
 /* -------------------- */
 
-.password {
-	position: relative;
+.show-password{
+  border-radius: 0px 0px 25px 25px;
+  background: #CFE2FF;
 }
-.password-control {
-	position: absolute;
-	top: 11px;
-	right: 6px;
-	display: inline-block;
-	width: 20px;
-	height: 20px;
-	background: url(/eye.png) 0 0 no-repeat;
-}
-.password-control.view {
-	background: url(/private.png) 0 0 no-repeat;
+
+input[type=checkbox]
+{
+  /* Double-sized Checkboxes */
+  -ms-transform: scale(2); /* IE */
+  -moz-transform: scale(2); /* FF */
+  -webkit-transform: scale(2); /* Safari and Chrome */
+  -o-transform: scale(2); /* Opera */
+  transform: scale(2);
+  padding: 10px;
+  margin-right: 15px;
 }
