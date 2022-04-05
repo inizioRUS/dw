@@ -11,35 +11,41 @@
             <th>Сменить на admin</th>
         </tr>
         {% for i in range(data |length) %}
-        {% if current_user.id != data[i].id %}
+        {% if current_user.id != data[i].id and (current_user.type_of_user == "SAdmin" or data[i].type_of_user not
+        in ["SAdmin" , "admin"])%}
         <tr>
             <td>{{data[i].login}}</td>
             <td>{{data[i].email}}</td>
             <td>{{data[i].type_of_user}}</td>
-            <td style="padding: 30px"><a href="/newtype?user_id={{data[i].id}}&type=basic" class="button">Click Here</a>
+            <td style="padding: 30px;"><a style="color: white;" href="/newtype?user_id={{data[i].id}}&type=basic">Click
+                Here</a>
             </td>
-            <td style="padding: 30px"><a href="/newtype?user_id={{data[i].id}}&type=creative" class="button">Click
+            <td style="padding: 30px; color: white;"><a style="color: white;"
+                                                        href="/newtype?user_id={{data[i].id}}&type=creative">Click
                 Here</a></td>
             {% if current_user.type_of_user == 'SAdmin' %}
-            <td style="padding: 30px"><a href="/newtype?user_id={{data[i].id}}&type=admin" class="button">Click Here</a>
+            <td style="padding: 30px; color: white;"><a style="color: white;"
+                                                        href="/newtype?user_id={{data[i].id}}&type=admin">Click Here</a>
             </td>
             {% endif %}
         </tr>
         {% endif %}
         {% endfor %}
     </table>
-    {% for i in comments %}
-    <a href="/view_of_studies/{{i.studie_id}}#{{i.id}}">
-        <div style="background: white">
-            <div class="">
-                {{i.user.login}}
-            </div>
-            <div style="padding-top: 50px">
-                {{i.text}}
-                <img src="/static/img/tmp/{{ i.user.id_foto}}.jpg" width="50px" , height="50px">
+    <div class="comments-section">
+        {% for i in range(comments|length) %}
+        <div class="comment">
+            <a href="/profile/{{comments[i].user_id}}">
+                <img src="/static/img/tmp/{{ comments[i].user.id_foto}}.jpg">
+            </a>
+            <div class="comment-info">
+                <a href="/profile/{{comments[i].user_id}}">
+                    <h3>{{comments[i].user.login}}</h3>
+                </a>
+                <p>{{comments[i].text}}</p>
             </div>
         </div>
-    </a>
-    {% endfor %}
+        {% endfor %}
+    </div>
 </div>
 {% endblock %}

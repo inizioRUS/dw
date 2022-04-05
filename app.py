@@ -78,7 +78,11 @@ def register():
         if session.query(User).filter(User.email == form.Email.data).first():
             return render_template('register.html',
                                    form=form,
-                                   message="Такой пользователь уже есть")
+                                   message="Такой пользователь уже есть(Почта)")
+        if session.query(User).filter(User.login == form.Login.data).first():
+            return render_template('register.html',
+                                   form=form,
+                                   message="Такой пользователь уже есть(Логин)")
         if form.photo.data:
             image = Image(
                 image=form.photo.data.read()
@@ -111,7 +115,7 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         session = db_session.create_session()
-        user = session.query(User).filter(User.email == form.email.data).first()
+        user = session.query(User).filter(User.login == form.login.data).first()
         if user and user.check_password(form.password.data):
             login_user(user, remember=form.remember_me.data)
             return redirect("/")

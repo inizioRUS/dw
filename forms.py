@@ -27,7 +27,7 @@ class Edit_form(FlaskForm):
 
 
 class LoginForm(FlaskForm):
-    email = EmailField('Email', validators=[DataRequired()])
+    login = StringField('Email', validators=[DataRequired()])
     password = PasswordField(validators=[DataRequired()])
     remember_me = BooleanField('Remember me')
     submit = SubmitField('Sign in')

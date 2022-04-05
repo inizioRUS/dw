@@ -16,9 +16,9 @@
             <form action="" method="post">
                 {{ form.hidden_tag() }}
                 <div class="form-input">
-                    <label for="login">EMail/Nickname</label>
-                    {{ form.email(class="input-field", placeholder="Логин") }}
-                    {% for error in form.email.errors %}
+                    <label for="login">Nickname</label>
+                    {{ form.login(class="input-field", placeholder="Логин") }}
+                    {% for error in form.login.errors %}
                     <p class="alert alert-danger" role="alert">
                         {{ error }}
                     </p>
@@ -34,7 +34,7 @@
                     {% endfor %}
                 </div>
                 <p>{{ form.remember_me() }} {{ form.remember_me.label(style="border-radius: 20px;") }}</p>
-                {{ form.submit(type="submit", class="button", value="Войт") }}
+                {{ form.submit(type="submit", class="button", value="Войти") }}
                 <div id="line"></div>
                 {{ message }}
                 <a href="/register" class="button">Регистрация</a>
